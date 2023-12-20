@@ -19,6 +19,7 @@ export class ImpressaoUnicaLoan {
         margin: [0, 4, 0, 0],
       },
       { text: "Nome do Livro", bold: true, fontSize: 9, margin: [0, 4, 0, 0] },
+      { text: "Edição do Livro", bold: true, fontSize: 9, margin: [0, 4, 0, 0] },
       {
         text: "Data de empréstimo",
         bold: true,
@@ -35,6 +36,7 @@ export class ImpressaoUnicaLoan {
     const body = [
       { text: this.dadosParaImpressao.clientId, fontSize: 8 },
       { text: this.dadosParaImpressao.bookId, fontSize: 8 },
+      { text: this.dadosParaImpressao.bookEdition, fontSize: 8 },
       { text: this.dadosParaImpressao.loanDate, fontSize: 8 },
       { text: this.dadosParaImpressao.returnDate, fontSize: 8 },
     ];
@@ -43,8 +45,9 @@ export class ImpressaoUnicaLoan {
         text: "__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________",
         alignment: "center",
         fontSize: 5,
-        colSpan: 3,
+        colSpan: 5,
       },
+      {},
       {},
       {},
       {},
@@ -72,7 +75,7 @@ export class ImpressaoUnicaLoan {
           layout: "noBorders",
           table: {
             headerRows: 1,
-            widths: ["*", 55, 55, 55],
+            widths: ["*", 55, 55, 55, 55],
             body: corpoDocumento,
           },
         },

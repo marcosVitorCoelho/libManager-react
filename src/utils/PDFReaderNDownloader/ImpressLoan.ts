@@ -1,8 +1,8 @@
-import { LoansData } from "../../contexts/LoanContext";
+import { Root } from "../../contexts/LoanContext";
 
 export class ImpressaoLoan {
-  dadosParaImpressao: LoansData[];
-  constructor(dadosParaImpressao: LoansData[]) {
+  dadosParaImpressao: Root[];
+  constructor(dadosParaImpressao: Root[]) {
     this.dadosParaImpressao = dadosParaImpressao;
   }
   async PreparaDocumento() {
@@ -34,8 +34,8 @@ export class ImpressaoLoan {
     ];
     const body = this.dadosParaImpressao.map((prod) => {
       return [
-        { text: prod.clientId, fontSize: 8 },
-        { text: prod.bookId, fontSize: 8 },
+        { text: prod.clientId.firstName + " " + prod.clientId.lastName, fontSize: 8 },
+        { text: prod.bookId.title, fontSize: 8 },
         { text: prod.loanDate, fontSize: 8 },
         { text: prod.returnDate, fontSize: 8 },
       ];
@@ -45,7 +45,7 @@ export class ImpressaoLoan {
         text: "__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________",
         alignment: "center",
         fontSize: 5,
-        colSpan: 3,
+        colSpan: 4,
       },
       {},
       {},

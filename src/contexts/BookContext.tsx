@@ -68,7 +68,7 @@ const BookProvider: React.FC<BookContextProps> = ({ children }) => {
         setBooks(data.data);
       }
     } catch (err) {
-      alert(err);
+      alert("Nenhum livro encontrado, cadastre um novo");
     }
   };
 

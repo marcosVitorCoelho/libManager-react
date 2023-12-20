@@ -135,13 +135,19 @@ export default function LocationFormPage() {
                     error={touched.bookId && Boolean(errors.bookId)}
                     helperText={touched.bookId && errors.bookId}
                   >
-                    {availableBooks.map((book) => {
+                    {id ? (books.map((book) => {
                       return (
                         <MenuItem value={book._id} key={book._id}>
                           {book.title + ", " + book.edition}
                         </MenuItem>
                       );
-                    })}
+                    })) : (availableBooks.map((book) => {
+                      return (
+                        <MenuItem value={book._id} key={book._id}>
+                          {book.title + ", " + book.edition}
+                        </MenuItem>
+                      );
+                    }))}
                   </TextField>
                   <Field
                     name="loanDate"

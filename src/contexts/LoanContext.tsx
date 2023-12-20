@@ -15,7 +15,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 interface LoanContextType {
   loanColumns: LoanColumn[];
   loanRows: LoanData[] | undefined;
-  loans: LoansData[];
+  loans: Root[];
   handleDelete: (id: string) => void;
   handleCreateNewLoans: (values: LocationSchemaData) => void;
   handleGetLoans: () => void;
@@ -35,9 +35,56 @@ export interface LoansData {
   returnDate: string;
 }
 
+export interface Root {
+  _id: string
+  clientId: ClientId
+  bookId: BookId
+  loanDate: string
+  returnDate: string
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
+
+export interface ClientId {
+  address: Address
+  _id: string
+  firstName: string
+  lastName: string
+  email: string
+  cpf: string
+  rg: string
+  phoneNumber: string
+  birthDate: string
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
+
+export interface Address {
+  street: string
+  city: string
+  state: string
+  number: string
+  zipCode: string
+}
+
+export interface BookId {
+  _id: string
+  title: string
+  edition: string
+  pages: number
+  avaliable: boolean
+  createdAt: string
+  updatedAt: string
+  __v: number
+}
+
+
 export interface LoansImpress {
   clientId: string;
   bookId: string;
+  bookEdition: string;
   loanDate: string;
   returnDate: string;
 }
@@ -60,15 +107,11 @@ function createData(
   };
 }
 
-export interface NewLoan {
-  title: string;
-  pages: number;
-}
 
 const LoanContext = createContext({} as LoanContextType);
 
 const LoanProvider: React.FC<LoanContextProps> = ({ children }) => {
-  const [loans, setLoans] = useState<LoansData[]>([]);
+  const [loans, setLoans] = useState<Root[]>([]);
   const [loansData, setLoansData] = useState<LoanData[]>([]);
   const navigate = useNavigate();
 
@@ -77,10 +120,10 @@ const LoanProvider: React.FC<LoanContextProps> = ({ children }) => {
       const responseData = await apiBase.get<AxiosResponse>("/loan");
       if (responseData.status === 200) {
         const { data } = responseData;
-        setLoans(data.data);
+        setLoans(data.data)
       }
     } catch (err) {
-      alert(err);
+      alert("Nenhum empréstimo encontrado");
     }
   };
 
@@ -98,14 +141,27 @@ const LoanProvider: React.FC<LoanContextProps> = ({ children }) => {
 
   const handleCreateNewLoans = async (values: LocationSchemaData) => {
     try {
-      const responseData = await apiBase.post<AxiosResponse>("/loan", values);
-      if (responseData.status === 201) {
+      const responseLoanData = await apiBase.post<AxiosResponse>("/loan", values);
+      if (responseLoanData.status === 201) {
         alert("Empréstimo realizado");
-        const classeImpressao = new ImpressaoUnicaLoan(values);
+        const responseCustomerData = await apiBase.get<AxiosResponse>(`/customers/${values.clientId}`);
+        const responseBookData = await apiBase.get<AxiosResponse>(`/books/${values.bookId}`);
+
+        console.log("livro: ", responseBookData.data.data)
+        console.log("Cliente: ", responseCustomerData.data.data)
+
+        const classeImpressao = new ImpressaoUnicaLoan({
+          clientId: responseCustomerData.data.data.firstName + " " + responseCustomerData.data.data.lastName,
+          bookId: responseBookData.data.data.title,
+          bookEdition: responseBookData.data.data.edition,
+          loanDate: values.loanDate,
+          returnDate: values.returnDate
+        });
         const documento = await classeImpressao.PreparaDocumento();
         pdfMake
           .createPdf(documento)
           .download("relatorio-empréstimos-cadastrados.pdf");
+        navigate("/loanPage")
       }
     } catch (err) {
       console.error(err);
@@ -119,7 +175,7 @@ const LoanProvider: React.FC<LoanContextProps> = ({ children }) => {
         values
       );
       if (responseData.status === 200) {
-        alert("Cliente atualizado!");
+        alert("Empréstimo atualizado!");
         navigate("/loanPage");
       }
     } catch (err) {
@@ -131,7 +187,7 @@ const LoanProvider: React.FC<LoanContextProps> = ({ children }) => {
     try {
       const responseData = await apiBase.delete<AxiosResponse>(`/loan/${id}`);
       if (responseData.status === 200) {
-        alert("Cliente Deletado!");
+        alert("Empréstimo Deletado!");
         location.reload();
       }
     } catch (err) {
@@ -188,11 +244,12 @@ const LoanProvider: React.FC<LoanContextProps> = ({ children }) => {
 
   useEffect(() => {
     if (loans !== null) {
+      console.log("EMPRESTIMOS: ", loans)
       setLoansData(
-        loans.map((Loan: LoansData) => {
+        loans.map((Loan: Root) => {
           return createData(
-            Loan.clientId,
-            Loan.bookId,
+            Loan.clientId.firstName,
+            Loan.bookId.title,
             Loan.loanDate,
             Loan.returnDate,
             <DeleteButton id={Loan._id} />,

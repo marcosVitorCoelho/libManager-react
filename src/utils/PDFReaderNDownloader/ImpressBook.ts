@@ -12,13 +12,15 @@ export class ImpressaoLivro {
   }
   CriaCorpoDocumento() {
     const header = [
-      { text: "Nome do Livro", bold: true, fontSize: 9, margin: [0, 4, 0, 0] },
+      { text: "Título", bold: true, fontSize: 9, margin: [0, 4, 0, 0] },
+      { text: "Edição", bold: true, fontSize: 9, margin: [0, 4, 0, 0] },
       { text: "Disponível", bold: true, fontSize: 9, margin: [0, 4, 0, 0] },
       { text: "Qtd. Páginas", bold: true, fontSize: 9, margin: [0, 4, 0, 0] },
     ];
     const body = this.dadosParaImpressao.map((prod) => {
       return [
         { text: prod.title, fontSize: 8 },
+        { text: prod.edition, fontSize: 8 },
         { text: prod.avaliable ? "SIM" : "NÃO", fontSize: 8 },
         { text: prod.pages, fontSize: 8 },
       ];
@@ -28,8 +30,9 @@ export class ImpressaoLivro {
         text: "__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________",
         alignment: "center",
         fontSize: 5,
-        colSpan: 3,
+        colSpan: 4,
       },
+      {},
       {},
       {},
     ];
@@ -56,7 +59,7 @@ export class ImpressaoLivro {
           layout: "noBorders",
           table: {
             headerRows: 1,
-            widths: ["*", 55, 55],
+            widths: ["*", 55, 55, 55],
             body: corpoDocumento,
           },
         },
